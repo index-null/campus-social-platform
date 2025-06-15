@@ -6,11 +6,8 @@ declare module '*.vue' {
   export default component
 }
 
-interface ImportMetaEnv {
-  readonly VITE_API_BASE_URL: string
-  // 更多环境变量...
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
+// 声明 @vueuse/core 的类型
+declare module '@vueuse/core' {
+  export function useDark(): Ref<boolean>
+  export function useToggle(value: Ref<boolean>): () => boolean
+} 

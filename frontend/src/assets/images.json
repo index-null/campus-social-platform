@@ -1,0 +1,250 @@
+{
+  "校园生活交友平台图片库": {
+    "搜索时间": "2025-01-12",
+    "总图片数量": 38,
+    "图片分类": {
+      "大学生校园生活": {
+        "描述": "展现大学校园环境和学生日常生活的图片",
+        "图片": [
+          {
+            "id": "LNkHyreGEDc",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1632834380561-d1e05839a33a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1632834380561-d1e05839a33a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 3933,
+              "height": 5899
+            },
+            "适合场景": ["主页banner", "用户个人资料"]
+          },
+          {
+            "id": "pzmxTokNBSw",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1732115234692-3ee71d5363af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1732115234692-3ee71d5363af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 3376,
+              "height": 6000
+            },
+            "适合场景": ["应用图标", "登录页面"]
+          },
+          {
+            "id": "mUj1XLjD7CM",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1732115054212-d367eed1b458?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1732115054212-d367eed1b458?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 4240,
+              "height": 2400
+            },
+            "适合场景": ["横版banner", "活动宣传"]
+          },
+          {
+            "id": "BFodFsvKCak",
+            "description": "Wits University, South Africa.",
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1638636214032-581196ffd400?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw0fHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1638636214032-581196ffd400?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw0fHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MHx8fHwxNzQ5OTUzMjYzfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 4000,
+              "height": 2250
+            },
+            "适合场景": ["校园介绍", "关于我们页面"]
+          }
+        ]
+      },
+      "学生社交聚会": {
+        "描述": "展现学生朋友聚会和社交互动的图片",
+        "图片": [
+          {
+            "id": "GjeWmfxFevs",
+            "description": "Students playing on the lawn of their university.",
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1684560208024-929ab9295d4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1684560208024-929ab9295d4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 6000,
+              "height": 3368
+            },
+            "适合场景": ["活动推荐", "社交功能介绍"]
+          },
+          {
+            "id": "jVZNpmS9Q5I",
+            "description": "Friends Barcelona, Spain 35mm Nikon F801 | Kodak Gold",
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1688322185458-0e9d0564bfe8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1688322185458-0e9d0564bfe8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 3090,
+              "height": 2048
+            },
+            "适合场景": ["朋友圈功能", "社交动态"]
+          },
+          {
+            "id": "u_Jg3Wv7h4M",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1648250537652-a648421c588c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1648250537652-a648421c588c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 6240,
+              "height": 4160
+            },
+            "适合场景": ["群组功能", "活动组织"]
+          },
+          {
+            "id": "8KBd3JSM_u4",
+            "description": "⁣⁣⁣Tasty Friendship⁣ 🇫🇷⁣⁣⁣⁣",
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1609989705616-3c4e66d0cd22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw4fHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1609989705616-3c4e66d0cd22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw4fHxjb2xsZWdlJTIwZnJpZW5kcyUyMHNvY2lhbGl6aW5nfGVufDB8fHx8MTc0OTk1MzI3MXww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 5184,
+              "height": 3456
+            },
+            "适合场景": ["美食分享", "生活社交"]
+          }
+        ]
+      },
+      "学习合作": {
+        "描述": "展现学生一起学习、讨论和合作的图片",
+        "图片": [
+          {
+            "id": "nFrp4u2Pkxw",
+            "description": "Records of Suzhou Eslite Bookstore in early 2018",
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1589872880544-76e896b0592c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1589872880544-76e896b0592c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 4699,
+              "height": 3133
+            },
+            "适合场景": ["学习小组", "图书馆功能"]
+          },
+          {
+            "id": "Us3MwKolPmg",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1660128356943-e1f893a56a89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1660128356943-e1f893a56a89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 6016,
+              "height": 4016
+            },
+            "适合场景": ["学术讨论", "课程分享"]
+          },
+          {
+            "id": "2tvA1heL5ic",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1543295523-78c9bbdba65c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1543295523-78c9bbdba65c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 4272,
+              "height": 2848
+            },
+            "适合场景": ["合作学习", "项目协作"]
+          },
+          {
+            "id": "g2jGCik7MAs",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1527418124353-ca783e9d1d1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw4fHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1527418124353-ca783e9d1d1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw4fHx5b3VuZyUyMHBlb3BsZSUyMHN0dWR5aW5nJTIwdG9nZXRoZXJ8ZW58MHx8fHwxNzQ5OTUzMjcyfDA&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 2548,
+              "height": 3810
+            },
+            "适合场景": ["辅导功能", "知识分享"]
+          }
+        ]
+      },
+      "校园社交生活": {
+        "描述": "展现校园内学生日常社交和休闲活动的图片",
+        "图片": [
+          {
+            "id": "Q_efTZ4Jp3k",
+            "description": "Students hanging out together",
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1685539144681-5b1386d5fd9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1685539144681-5b1386d5fd9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwxfHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 3376,
+              "height": 6000
+            },
+            "适合场景": ["社交发现", "交友推荐"]
+          },
+          {
+            "id": "OCeFyF2xrz4",
+            "description": "Students hanging out together",
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1685539144718-91299feab7f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1685539144718-91299feab7f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwyfHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 3688,
+              "height": 6000
+            },
+            "适合场景": ["校园聊天", "即时通讯"]
+          },
+          {
+            "id": "J16r3dyRM-M",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1708578200684-3aa944b73237?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1708578200684-3aa944b73237?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHwzfHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 6627,
+              "height": 3728
+            },
+            "适合场景": ["活动组织", "社团介绍"]
+          },
+          {
+            "id": "yAqXR6NsIT0",
+            "description": null,
+            "urls": {
+              "regular": "https://images.unsplash.com/photo-1647881937325-c9e09eff68e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw0fHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+              "small": "https://images.unsplash.com/photo-1647881937325-c9e09eff68e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjExNDZ8MHwxfHNlYXJjaHw0fHxjYW1wdXMlMjBzb2NpYWwlMjBsaWZlfGVufDB8fHx8MTc0OTk1MzI3M3ww&ixlib=rb-4.1.0&q=80&w=400"
+            },
+            "dimensions": {
+              "width": 6480,
+              "height": 3810
+            },
+            "适合场景": ["休闲娱乐", "兴趣匹配"]
+          }
+        ]
+      }
+    },
+    "使用建议": {
+      "主页banner": "推荐使用横版或高质量的校园生活图片",
+      "用户头像": "可使用社交聚会类的图片作为默认头像选项",
+      "功能图标": "学习合作类图片适合学习功能，社交生活类适合交友功能",
+      "活动推广": "使用高分辨率的聚会和活动类图片",
+      "背景图": "校园环境图片适合作为各个页面的背景"
+    },
+    "版权说明": "所有图片来源于Unsplash，遵循Unsplash License，可用于商业和非商业用途",
+    "搜索关键词记录": [
+      "university students campus",
+      "college friends socializing", 
+      "young people studying together",
+      "campus social life"
+    ]
+  }
+}

@@ -1,11 +1,23 @@
 <script setup lang="ts">
+import { RouterView } from 'vue-router'
+import { onMounted } from 'vue'
+import { useUserStore } from '@/stores/user'
+
+
+const userStore = useUserStore()
+
+// 应用启动时检查登录状态
+onMounted(async () => {
+  if (userStore.token) {
+    await userStore.fetchUserInfo()
+  }
+})
 </script>
 
 <template>
-  <router-link to="/">Home</router-link>
-  <router-link to="/login">Login</router-link>
-  <router-link to="/register">Register</router-link>
-  <router-view />
+  <div id="app">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>

@@ -16,7 +16,7 @@ export const errorHandler = (
   err: Error | AppError,
   req: Request,
   res: Response,
-  next: NextFunction
+  _: NextFunction
 ): void => {
   let statusCode = 500;
   let message = '服务器内部错误';
