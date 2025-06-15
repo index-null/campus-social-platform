@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: campus-social-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: campus-social
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - campus-social-network
+
+  backend:
+    build: ./backend
+    container_name: campus-social-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongodb:27017/campus-social
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - campus-social-network
+
+  frontend:
+    build: ./frontend
+    container_name: campus-social-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - campus-social-network
+
+networks:
+  campus-social-network:
+    driver: bridge
+
+volumes:
+  mongodb_data: 
