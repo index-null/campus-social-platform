@@ -126,7 +126,7 @@
               <template v-if="posts.length > 0">
                 <PostCard
                   v-for="(post, index) in posts"
-                  :key="post.id"
+                  :key="post._id"
                   :post="post"
                   v-motion-fade-in-up
                   :style="{ animationDelay: `${index * 0.1}s` }"
@@ -323,6 +323,8 @@ import { Message } from '@arco-design/web-vue'
 import { getRandomImage, getImageByScene } from '@/config/images'
 import AppLayout from '@/components/AppLayout.vue'
 import PostCard from '@/components/PostCard.vue'
+import { getPublicPosts, getFeed } from '@/api/auth'; // 从您的 api 文件导入
+import type { IPost } from '@/types'; // 强烈建议为 Post 创建类型定义，如果已有请忽略
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -404,43 +406,38 @@ const loadActivities = () => {
 }
 
 // 加载动态
+// 请将旧的 loadPosts 函数完全删除，替换为这个新的版本
 const loadPosts = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    // 模拟加载动态
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // 如果已登录，显示模拟数据
-    if (isLoggedIn.value) {
-      posts.value = Array.from({ length: 5 }, (_, i) => ({
-        id: `post-${i}`,
-        author: {
-          id: i % 2 === 0 ? user.value?.id : `user-${i}`,
-          username: i % 2 === 0 ? user.value?.username : `用户${i + 1}`,
-          avatar: getRandomImage('学生社交聚会').urls.small
-        },
-        content: [
-          '今天在图书馆学习了一整天，收获满满！#学习打卡',
-          '食堂新出的麻辣香锅太好吃了，强烈推荐！#美食分享',
-          '篮球比赛赢了！感谢队友们的努力💪 #运动健身',
-          '社团活动圆满结束，感谢所有参与的同学！#社团活动',
-          '春天的校园真美，随手一拍都是风景🌸 #校园日常'
-        ][i],
-        images: i % 3 === 0 ? [
-          getRandomImage('校园生活').urls.regular,
-          getRandomImage('学习场景').urls.regular
-        ] : [],
-        tags: i % 2 === 0 ? ['校园日常', '学习打卡'] : ['美食分享'],
-        likeCount: Math.floor(Math.random() * 100),
-        commentCount: Math.floor(Math.random() * 50),
-        isLiked: Math.random() > 0.5,
-        createdAt: new Date(Date.now() - Math.random() * 86400000 * 7)
-      }))
+    let response;
+    // 根据登录状态，调用不同的API
+    if (userStore.isLoggedIn) {
+      // 已登录用户，调用 getFeed (您可能需要后续实现此接口的特定逻辑，暂时可以先用公开接口代替)
+      // response = await getFeed();
+      // 在 getFeed 接口实现前，我们先统一使用公开接口
+      response = await getPublicPosts();
+    } else {
+      // 未登录游客，调用获取公开动态的接口
+      response = await getPublicPosts();
     }
+
+    // 注意：您的后端返回的数据可能在 response.data.data 中
+    // 请根据您后端的实际返回结构进行调整
+    if (response && response.data) {
+      posts.value = response.data;
+    } else {
+      posts.value = [];
+    }
+
+  } catch (err) {
+    console.error("加载动态失败:", err);
+    Message.error('加载动态失败，请稍后重试');
+    posts.value = []; // 出错时清空列表
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // 加载更多
 const loadMore = async () => {
