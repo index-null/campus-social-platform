@@ -21,7 +21,7 @@
             <div class="info-left">
               <a-avatar
                 :size="120"
-                :src="profileUser?.avatar || `https://ui-avatars.com/api/?name=${profileUser?.username}`"
+                :src="getAvatarUrl(profileUser)"
                 class="profile-avatar"
               />
               <div class="profile-details">
@@ -192,22 +192,43 @@
     >
       <a-form :model="editForm" layout="vertical">
         <a-form-item label="头像">
-          <a-space>
-            <a-avatar
-              :size="80"
-              :src="editForm.avatar || currentUser?.avatar || `https://ui-avatars.com/api/?name=${currentUser?.username}`"
-            />
-            <a-upload
-              accept="image/*"
-              :show-file-list="false"
-              @change="handleAvatarChange"
-            >
-              <a-button>
-                <template #icon><icon-upload /></template>
-                更换头像
+          <div class="avatar-upload-section">
+            <div class="avatar-preview-container">
+              <a-spin :loading="avatarUploading">
+                <a-avatar
+                  :size="80"
+                  :src="editForm.avatar || getAvatarUrl(currentUser)"
+                  class="profile-avatar-preview"
+                />
+              </a-spin>
+            </div>
+            <div class="avatar-actions">
+                              <a-upload
+                  accept="image/*"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                  @change="handleAvatarChange"
+                  :disabled="avatarUploading"
+                >
+                <a-button :loading="avatarUploading">
+                  <template #icon><icon-upload /></template>
+                  {{ editForm.avatar ? '更换头像' : '上传头像' }}
+                </a-button>
+              </a-upload>
+              <a-button
+                v-if="editForm.avatar"
+                type="text"
+                status="danger"
+                @click="removeAvatar"
+              >
+                <template #icon><icon-delete /></template>
+                删除头像
               </a-button>
-            </a-upload>
-          </a-space>
+            </div>
+            <a-typography-text type="secondary" class="avatar-tip">
+              建议尺寸：200×200，支持JPG、PNG格式，文件大小不超过5MB
+            </a-typography-text>
+          </div>
         </a-form-item>
 
         <a-form-item label="用户名">
@@ -251,6 +272,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { Message } from '@arco-design/web-vue'
 import { getImageByScene } from '@/config/images'
+import { updateProfile } from '@/api/auth'
+import { getAvatarUrl, validateAvatarFile, fileToBase64, saveUserAvatar, removeUserAvatar } from '@/utils/avatar'
 import AppLayout from '@/components/AppLayout.vue'
 import PostCard from '@/components/PostCard.vue'
 
@@ -294,6 +317,7 @@ const posts = ref<any[]>([])
 // 编辑表单
 const editForm = reactive({
   username: '',
+  nickname: '',
   bio: '',
   interests: [] as string[],
   email: '',
@@ -441,28 +465,88 @@ const deletePost = (postId: string) => {
   stats.postCount--
 }
 
+// 头像上传状态
+const avatarUploading = ref(false)
+
 // 头像上传
-const handleAvatarChange = (_fileList: any, file: any) => {
-  if (file.status === 'done') {
-    editForm.avatar = URL.createObjectURL(file.file)
-    Message.success('头像上传成功')
+const handleAvatarChange = async (_fileList: any[], file: any) => {
+  if (!file || !file.file) return
+  
+  const currentFile = file.file
+  
+  // 使用工具函数验证文件
+  const validation = validateAvatarFile(currentFile)
+  if (!validation.valid) {
+    Message.error(validation.message)
+    return
   }
+
+  avatarUploading.value = true
+  
+  try {
+    // 使用工具函数转换为base64
+    const result = await fileToBase64(currentFile)
+    editForm.avatar = result
+    
+    // 立即保存到localStorage
+    if (currentUser.value?.id) {
+      saveUserAvatar(currentUser.value.id, result)
+    }
+    
+    Message.success('头像上传成功')
+  } catch (error) {
+    console.error('头像处理失败:', error)
+    Message.error('头像处理失败，请重试')
+  } finally {
+    avatarUploading.value = false
+  }
+}
+
+// 删除头像
+const removeAvatar = () => {
+  editForm.avatar = ''
+  
+  // 从localStorage删除
+  if (currentUser.value?.id) {
+    removeUserAvatar(currentUser.value.id)
+  }
+  
+  Message.success('头像已删除')
 }
 
 // 更新个人资料
 const handleUpdateProfile = async () => {
   updating.value = true
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // 调用API更新接口（不包括头像）
+    const response: any = await updateProfile({
+      username: editForm.username,
+      nickname: editForm.nickname,
+      bio: editForm.bio,
+      interests: editForm.interests
+    })
     
     // 更新本地数据
-    if (currentUser.value) {
-      Object.assign(currentUser.value, editForm)
-      profileUser.value = { ...currentUser.value }
+    if (currentUser.value && response.user) {
+      // 更新用户store
+      userStore.user = response.user
+      profileUser.value = { ...response.user }
+      
+      // 头像已经在上传时保存到localStorage，这里不需要处理
+      
+      // 更新存储的用户数据
+      if (localStorage.getItem('token')) {
+        localStorage.setItem('userData', JSON.stringify(response.user))
+      } else {
+        sessionStorage.setItem('userData', JSON.stringify(response.user))
+      }
     }
     
-    Message.success('更新成功')
+    Message.success(response.message || '更新成功')
     showEditModal.value = false
+  } catch (error: any) {
+    console.error('更新个人资料失败:', error)
+    Message.error(error.message || '更新失败，请重试')
   } finally {
     updating.value = false
   }
@@ -472,12 +556,17 @@ const handleUpdateProfile = async () => {
 const resetEditForm = () => {
   if (currentUser.value) {
     editForm.username = currentUser.value.username
+    editForm.nickname = currentUser.value.nickname || ''
     editForm.bio = currentUser.value.bio || ''
     editForm.interests = currentUser.value.interests || []
     editForm.email = currentUser.value.email
-    editForm.avatar = currentUser.value.avatar || ''
+    
+    // 从localStorage获取头像
+    editForm.avatar = getAvatarUrl(currentUser.value)
   }
 }
+
+
 
 // 打开编辑弹窗时初始化表单
 watch(showEditModal, (val) => {
@@ -571,6 +660,38 @@ watch(showEditModal, (val) => {
 
 .post-list {
   min-height: 400px;
+}
+
+.avatar-upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-preview-container {
+  position: relative;
+}
+
+.profile-avatar-preview {
+  border: 2px solid var(--color-border-2);
+  cursor: pointer;
+  
+  &:hover {
+    border-color: var(--color-primary-6);
+  }
+}
+
+.avatar-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar-tip {
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.4;
 }
 
 // 响应式处理

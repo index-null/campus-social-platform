@@ -43,7 +43,6 @@ export const register = (data: {
   nickname?: string
   email: string
   password: string
-  avatar?: string
   bio?: string
   interests?: string[]
 }) => {
@@ -56,7 +55,13 @@ export const getProfile = () => {
 }
 
 // 更新个人信息
-export const updateProfile = (data: any) => {
+export const updateProfile = (data: {
+  username?: string
+  nickname?: string
+  email?: string
+  bio?: string
+  interests?: string[]
+}) => {
   return api.put('/auth/profile', data)
 }
 

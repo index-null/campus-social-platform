@@ -141,26 +141,49 @@
                 </a-input>
               </a-form-item>
 
-              <a-form-item field="avatar" label="头像">
-                <div class="avatar-upload-container">
-                  <a-upload
-                    ref="avatarUpload"
-                    accept="image/*"
-                    :show-file-list="false"
-                    :auto-upload="false"
-                    :before-upload="handleAvatarUpload"
+                          <a-form-item field="avatar" label="头像（可选）">
+              <div class="avatar-upload-container">
+                <a-upload
+                  ref="avatarUpload"
+                  accept="image/*"
+                  :show-file-list="false"
+                  :auto-upload="false"
+                  @change="handleAvatarChange"
+                  :disabled="avatarUploading"
+                >
+                  <div class="avatar-upload-wrapper">
+                    <a-spin :loading="avatarUploading" class="avatar-spin">
+                      <div class="avatar-upload" v-if="!form.avatar">
+                        <icon-plus :size="20" />
+                        <div class="upload-text">上传头像</div>
+                      </div>
+                      <a-avatar
+                        v-else
+                        :src="form.avatar"
+                        :size="80"
+                        class="avatar-preview"
+                      />
+                    </a-spin>
+                  </div>
+                </a-upload>
+                <div class="avatar-actions" v-if="form.avatar">
+                  <a-button
+                    size="small"
+                    type="text"
+                    status="danger"
+                    @click="removeAvatar"
                   >
-                    <div class="avatar-upload" v-if="!form.avatar">
-                      <icon-plus :size="20" />
-                      <div class="upload-text">上传头像</div>
-                    </div>
-                    <img v-else :src="form.avatar" class="avatar-preview" alt="头像预览" />
-                  </a-upload>
-                  <a-typography-text type="secondary" class="upload-tip">
-                    建议尺寸：200x200，支持JPG、PNG格式
-                  </a-typography-text>
+                    <template #icon>
+                      <icon-delete />
+                    </template>
+                    删除头像
+                  </a-button>
                 </div>
-              </a-form-item>
+                <a-typography-text type="secondary" class="upload-tip">
+                  建议尺寸：200×200，支持JPG、PNG格式，文件大小不超过5MB
+                </a-typography-text>
+              </div>
+            </a-form-item>
 
               <a-form-item field="bio" label="个人简介">
                 <a-textarea
@@ -272,6 +295,7 @@ import { Message } from '@arco-design/web-vue'
 // import type { FormInstance } from '@arco-design/web-vue'
 import { register } from '@/api/auth'
 import { getImageByScene } from '@/config/images'
+import { validateAvatarFile, fileToBase64, saveUserAvatar } from '@/utils/avatar'
 
 const router = useRouter()
 const formRef = ref<any>()
@@ -375,13 +399,49 @@ const rules = {
 
 // 头像上传
 const avatarUpload = ref()
-const handleAvatarUpload = (file: File) => {
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    form.avatar = e.target?.result as string
+const avatarUploading = ref(false)
+
+const handleAvatarChange = async (fileList: any[], file: any) => {
+  console.log('头像上传触发:', { fileList, file })
+  
+  if (!file || !file.file) {
+    console.warn('没有接收到文件')
+    return
   }
-  reader.readAsDataURL(file)
-  return false // 阻止默认上传行为
+
+  const currentFile = file.file
+  
+  // 使用工具函数验证文件
+  const validation = validateAvatarFile(currentFile)
+  if (!validation.valid) {
+    Message.error(validation.message)
+    return
+  }
+
+  avatarUploading.value = true
+  
+  try {
+    // 使用工具函数转换为base64
+    const result = await fileToBase64(currentFile)
+    form.avatar = result
+    
+    // 临时保存，注册成功后会正式保存
+    localStorage.setItem('tempAvatar', result)
+    console.log('头像处理成功:', result.substring(0, 50) + '...')
+    Message.success('头像上传成功')
+  } catch (error) {
+    console.error('头像处理失败:', error)
+    Message.error('头像处理失败，请重试')
+  } finally {
+    avatarUploading.value = false
+  }
+}
+
+// 删除头像
+const removeAvatar = () => {
+  form.avatar = ''
+  localStorage.removeItem('tempAvatar')
+  Message.success('头像已删除')
 }
 
 // 兴趣标签切换
@@ -423,20 +483,40 @@ const handleSubmit = async () => {
   if (valid) return
 
   loading.value = true
+  
+  const registerData = {
+    studentId: form.studentId,
+    username: form.username,
+    nickname: form.nickname,
+    email: form.email,
+    password: form.password,
+    bio: form.bio,
+    interests: form.interests
+  }
+  
+  console.log('提交注册数据:', {
+    ...registerData,
+    password: '***',
+    hasAvatar: !!form.avatar
+  })
+  
   try {
-    await register({
-      studentId: form.studentId,
-      username: form.username,
-      nickname: form.nickname,
-      email: form.email,
-      password: form.password,
-      avatar: form.avatar,
-      bio: form.bio,
-      interests: form.interests
-    })
+    const response: any = await register(registerData)
+    console.log('注册响应:', response)
+    
+    // 注册成功后，如果有头像则保存到localStorage
+    if (form.avatar && response.user?.id) {
+      saveUserAvatar(response.user.id, form.avatar)
+      console.log('头像已保存到localStorage，用户ID:', response.user.id)
+    }
+    
+    // 清理临时头像数据
+    localStorage.removeItem('tempAvatar')
+    
     Message.success('注册成功，请登录')
     router.push('/login')
   } catch (error: any) {
+    console.error('注册失败:', error)
     Message.error(error.message || '注册失败')
   } finally {
     loading.value = false
@@ -447,6 +527,12 @@ const handleSubmit = async () => {
 if (localStorage.getItem('theme') === 'dark') {
   document.body.setAttribute('arco-theme', 'dark')
   isDark.value = true
+}
+
+// 恢复临时头像数据
+const tempAvatar = localStorage.getItem('tempAvatar')
+if (tempAvatar) {
+  form.avatar = tempAvatar
 }
 </script>
 
@@ -597,9 +683,18 @@ if (localStorage.getItem('theme') === 'dark') {
   text-align: center;
 }
 
+.avatar-upload-wrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.avatar-spin {
+  display: block;
+}
+
 .avatar-upload {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border: 2px dashed var(--color-border-2);
   border-radius: 50%;
   display: flex;
@@ -608,7 +703,7 @@ if (localStorage.getItem('theme') === 'dark') {
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin: 0 auto;
+  background-color: var(--color-bg-2);
 
   &:hover {
     border-color: var(--color-primary-6);
@@ -617,11 +712,12 @@ if (localStorage.getItem('theme') === 'dark') {
 }
 
 .avatar-preview {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
   cursor: pointer;
+  border: 2px solid var(--color-border-2);
+  
+  &:hover {
+    border-color: var(--color-primary-6);
+  }
 }
 
 .upload-text {
@@ -630,10 +726,15 @@ if (localStorage.getItem('theme') === 'dark') {
   margin-top: 4px;
 }
 
+.avatar-actions {
+  margin-top: 12px;
+}
+
 .upload-tip {
   display: block;
-  margin-top: 8px;
+  margin-top: 12px;
   font-size: 12px;
+  line-height: 1.4;
 }
 
 .interests-container {

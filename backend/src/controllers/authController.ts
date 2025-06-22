@@ -19,7 +19,17 @@ export const register = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { studentId, username, nickname, email, password, avatar, bio, interests } = req.body;
+    const { studentId, username, nickname, email, password, bio, interests } = req.body;
+
+    console.log('接收到注册请求:', {
+      studentId,
+      username,
+      nickname,
+      email,
+      bio,
+      interests,
+      password: '***'
+    });
 
     // 检查用户是否已存在
     const existingUser = await User.findOne({
@@ -38,18 +48,29 @@ export const register = async (
       password
     };
 
-    // 添加可选字段
+    // 添加可选字段（不包括头像）
     if (nickname) userData.nickname = nickname;
-    if (avatar) userData.avatar = avatar;
     if (bio) userData.bio = bio;
     if (interests && Array.isArray(interests)) userData.interests = interests;
 
+    console.log('创建用户数据:', {
+      ...userData,
+      password: '***'
+    });
+
     const user = await User.create(userData);
+    console.log('用户创建成功:', {
+      id: user.id,
+      studentId: user.studentId,
+      username: user.username,
+      nickname: user.nickname
+    });
 
     const token = generateToken(user.id);
 
     res.status(201).json({
       success: true,
+      message: '注册成功',
       token,
       user: {
         id: user.id,
@@ -57,10 +78,10 @@ export const register = async (
         username: user.username,
         nickname: user.nickname,
         email: user.email,
-        avatar: user.avatar,
         bio: user.bio,
         interests: user.interests,
-        role: user.role
+        role: user.role,
+        createdAt: user.createdAt
       }
     });
   } catch (error) {
@@ -101,6 +122,7 @@ export const login = async (
 
     res.json({
       success: true,
+      message: '登录成功',
       token,
       user: {
         id: user.id,
@@ -108,10 +130,11 @@ export const login = async (
         username: user.username,
         nickname: user.nickname,
         email: user.email,
-        role: user.role,
-        avatar: user.avatar,
         bio: user.bio,
-        interests: user.interests
+        interests: user.interests,
+        role: user.role,
+        lastActiveAt: user.lastActiveAt,
+        createdAt: user.createdAt
       }
     });
   } catch (error) {
@@ -125,9 +148,27 @@ export const getProfile = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const user = await User.findById(req.user!._id).select('-password');
+    
+    if (!user) {
+      throw new AppError('用户不存在', 404);
+    }
+
     res.json({
       success: true,
-      user: req.user
+      user: {
+        id: user.id,
+        studentId: user.studentId,
+        username: user.username,
+        nickname: user.nickname,
+        email: user.email,
+        bio: user.bio,
+        interests: user.interests,
+        role: user.role,
+        lastActiveAt: user.lastActiveAt,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
     });
   } catch (error) {
     next(error);
@@ -140,14 +181,14 @@ export const updateProfile = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const updates = ['username', 'nickname', 'bio', 'interests', 'avatar'];
+    const { username, nickname, bio, interests } = req.body;
     const updateData: Record<string, unknown> = {};
 
-    updates.forEach(field => {
-      if (req.body[field] !== undefined) {
-        updateData[field] = req.body[field];
-      }
-    });
+    // 字段更新（不包括头像）
+    if (username !== undefined) updateData.username = username;
+    if (nickname !== undefined) updateData.nickname = nickname;
+    if (bio !== undefined) updateData.bio = bio;
+    if (interests !== undefined && Array.isArray(interests)) updateData.interests = interests;
 
     const user = await User.findByIdAndUpdate(
       req.user!._id,
@@ -155,9 +196,25 @@ export const updateProfile = async (
       { new: true, runValidators: true }
     ).select('-password');
 
+    if (!user) {
+      throw new AppError('用户不存在', 404);
+    }
+
     res.json({
       success: true,
-      user
+      message: '更新成功',
+      user: {
+        id: user.id,
+        studentId: user.studentId,
+        username: user.username,
+        nickname: user.nickname,
+        email: user.email,
+        bio: user.bio,
+        interests: user.interests,
+        role: user.role,
+        lastActiveAt: user.lastActiveAt,
+        createdAt: user.createdAt
+      }
     });
   } catch (error) {
     next(error);

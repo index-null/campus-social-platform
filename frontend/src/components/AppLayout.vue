@@ -38,7 +38,7 @@
               <a-dropdown trigger="hover">
                 <a-avatar
                   :size="36"
-                  :src="user?.avatar || `https://ui-avatars.com/api/?name=${user?.username}`"
+                  :src="getAvatarUrl(user)"
                   style="cursor: pointer"
                 ></a-avatar>
                 <template #content>
@@ -90,6 +90,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { getAvatarUrl } from '@/utils/avatar'
 // ADDED START: 导入您的 logo 图片
 import logoUrl from '@/assets/logo.png'; // <-- 确保路径和文件名正确
 // ADDED END
