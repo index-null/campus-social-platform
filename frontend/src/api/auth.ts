@@ -40,6 +40,7 @@ export const login = (data: {
 export const register = (data: {
   studentId: string
   username: string
+  nickname?: string
   email: string
   password: string
   avatar?: string

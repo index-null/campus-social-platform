@@ -42,99 +42,198 @@
             </a-typography-text>
           </div>
 
+          <!-- 步骤导航 -->
+          <div class="steps-container">
+            <a-steps :current="currentStep - 1" size="small">
+              <a-step title="基本信息" />
+              <a-step title="个人资料" />
+              <a-step title="兴趣标签" />
+            </a-steps>
+          </div>
+
           <a-form
             ref="formRef"
             :model="form"
             :rules="rules"
             layout="vertical"
-            @submit="handleSubmit"
             class="register-form"
           >
-            <a-form-item field="studentId" label="学号">
-              <a-input
-                v-model="form.studentId"
-                placeholder="请输入学号"
-                size="large"
-                allow-clear
-              >
-                <template #prefix>
-                  <icon-idcard />
-                </template>
-              </a-input>
-            </a-form-item>
+            <!-- 第一步：基本信息 -->
+            <div v-show="currentStep === 1" class="step-content">
+              <a-form-item field="studentId" label="学号">
+                <a-input
+                  v-model="form.studentId"
+                  placeholder="请输入学号"
+                  size="large"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-idcard />
+                  </template>
+                </a-input>
+              </a-form-item>
 
-            <a-form-item field="username" label="用户名">
-              <a-input
-                v-model="form.username"
-                placeholder="请输入用户名"
-                size="large"
-                allow-clear
-              >
-                <template #prefix>
-                  <icon-user />
-                </template>
-              </a-input>
-            </a-form-item>
+              <a-form-item field="username" label="用户名">
+                <a-input
+                  v-model="form.username"
+                  placeholder="请输入用户名"
+                  size="large"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-user />
+                  </template>
+                </a-input>
+              </a-form-item>
 
-            <a-form-item field="email" label="邮箱">
-              <a-input
-                v-model="form.email"
-                placeholder="请输入邮箱"
-                size="large"
-                allow-clear
-              >
-                <template #prefix>
-                  <icon-email />
-                </template>
-              </a-input>
-            </a-form-item>
+              <a-form-item field="email" label="邮箱">
+                <a-input
+                  v-model="form.email"
+                  placeholder="请输入邮箱"
+                  size="large"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-email />
+                  </template>
+                </a-input>
+              </a-form-item>
 
-            <a-form-item field="password" label="密码">
-              <a-input-password
-                v-model="form.password"
-                placeholder="请输入密码"
-                size="large"
-                allow-clear
-              >
-                <template #prefix>
-                  <icon-lock />
-                </template>
-              </a-input-password>
-            </a-form-item>
+              <a-form-item field="password" label="密码">
+                <a-input-password
+                  v-model="form.password"
+                  placeholder="请输入密码"
+                  size="large"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-lock />
+                  </template>
+                </a-input-password>
+              </a-form-item>
 
-            <a-form-item field="confirmPassword" label="确认密码">
-              <a-input-password
-                v-model="form.confirmPassword"
-                placeholder="请再次输入密码"
-                size="large"
-                allow-clear
-              >
-                <template #prefix>
-                  <icon-lock />
-                </template>
-              </a-input-password>
-            </a-form-item>
+              <a-form-item field="confirmPassword" label="确认密码">
+                <a-input-password
+                  v-model="form.confirmPassword"
+                  placeholder="请再次输入密码"
+                  size="large"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-lock />
+                  </template>
+                </a-input-password>
+              </a-form-item>
+            </div>
 
-            <a-form-item field="agreement">
-              <a-checkbox v-model="form.agreement">
-                我已阅读并同意
-                <a-link>用户协议</a-link>
-                和
-                <a-link>隐私政策</a-link>
-              </a-checkbox>
-            </a-form-item>
+            <!-- 第二步：个人资料 -->
+            <div v-show="currentStep === 2" class="step-content">
+              <a-form-item field="nickname" label="昵称">
+                <a-input
+                  v-model="form.nickname"
+                  placeholder="请输入昵称（可选）"
+                  size="large"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-star />
+                  </template>
+                </a-input>
+              </a-form-item>
 
-            <a-form-item>
-              <a-button
-                type="primary"
-                html-type="submit"
-                size="large"
-                long
-                :loading="loading"
-              >
-                注册
-              </a-button>
-            </a-form-item>
+              <a-form-item field="avatar" label="头像">
+                <div class="avatar-upload-container">
+                  <a-upload
+                    ref="avatarUpload"
+                    accept="image/*"
+                    :show-file-list="false"
+                    :auto-upload="false"
+                    :before-upload="handleAvatarUpload"
+                  >
+                    <div class="avatar-upload" v-if="!form.avatar">
+                      <icon-plus :size="20" />
+                      <div class="upload-text">上传头像</div>
+                    </div>
+                    <img v-else :src="form.avatar" class="avatar-preview" alt="头像预览" />
+                  </a-upload>
+                  <a-typography-text type="secondary" class="upload-tip">
+                    建议尺寸：200x200，支持JPG、PNG格式
+                  </a-typography-text>
+                </div>
+              </a-form-item>
+
+              <a-form-item field="bio" label="个人简介">
+                <a-textarea
+                  v-model="form.bio"
+                  placeholder="介绍一下你自己吧~（可选）"
+                  :max-length="200"
+                  show-word-limit
+                  :auto-size="{ minRows: 3, maxRows: 4 }"
+                />
+              </a-form-item>
+            </div>
+
+            <!-- 第三步：兴趣标签 -->
+            <div v-show="currentStep === 3" class="step-content">
+              <a-form-item field="interests" label="兴趣标签">
+                <div class="interests-container">
+                  <a-typography-text type="secondary" class="interests-tip">
+                    选择您感兴趣的标签（可选）
+                  </a-typography-text>
+                  <div class="interests-grid">
+                    <a-tag
+                      v-for="interest in interestOptions"
+                      :key="interest"
+                      :checkable="true"
+                      :checked="form.interests.includes(interest)"
+                      @check="(checked: boolean) => toggleInterest(interest, checked)"
+                      class="interest-tag"
+                    >
+                      {{ interest }}
+                    </a-tag>
+                  </div>
+                </div>
+              </a-form-item>
+
+              <a-form-item field="agreement">
+                <a-checkbox v-model="form.agreement">
+                  我已阅读并同意
+                  <a-link>用户协议</a-link>
+                  和
+                  <a-link>隐私政策</a-link>
+                </a-checkbox>
+              </a-form-item>
+            </div>
+
+            <!-- 步骤导航按钮 -->
+            <div class="step-actions">
+              <a-space fill :size="16">
+                <a-button 
+                  v-if="currentStep > 1"
+                  size="large" 
+                  @click="prevStep"
+                >
+                  上一步
+                </a-button>
+                <a-button 
+                  v-if="currentStep < totalSteps"
+                  type="primary"
+                  size="large"
+                  @click="nextStep"
+                >
+                  下一步
+                </a-button>
+                <a-button
+                  v-if="currentStep === totalSteps"
+                  type="primary"
+                  size="large"
+                  :loading="loading"
+                  @click="handleSubmit"
+                >
+                  完成注册
+                </a-button>
+              </a-space>
+            </div>
           </a-form>
 
           <!-- 第三方登录 -->
@@ -178,6 +277,10 @@ const router = useRouter()
 const formRef = ref<any>()
 const loading = ref(false)
 
+// 分步注册状态
+const currentStep = ref(1)
+const totalSteps = 3
+
 // 暗黑模式
 const isDark = ref(document.body.hasAttribute('arco-theme'))
 const toggleTheme = () => {
@@ -203,11 +306,23 @@ const features = [
 const form = reactive({
   studentId: '',
   username: '',
+  nickname: '',
   email: '',
   password: '',
   confirmPassword: '',
+  avatar: '',
+  bio: '',
+  interests: [] as string[],
   agreement: false
 })
+
+// 预设兴趣标签
+const interestOptions = [
+  '学习', '运动', '音乐', '电影', '读书', '游戏', 
+  '旅行', '摄影', '美食', '编程', '绘画', '舞蹈',
+  '篮球', '足球', '羽毛球', '乒乓球', '游泳', '跑步',
+  '动漫', '综艺', '科技', '时尚', '宠物', '手工'
+]
 
 // 表单验证规则
 const rules = {
@@ -218,6 +333,9 @@ const rules = {
   username: [
     { required: true, message: '请输入用户名' },
     { minLength: 3, maxLength: 20, message: '用户名长度为3-20个字符' }
+  ],
+  nickname: [
+    { maxLength: 30, message: '昵称不能超过30个字符' }
   ],
   email: [
     { required: true, message: '请输入邮箱' },
@@ -239,6 +357,9 @@ const rules = {
       }
     }
   ],
+  bio: [
+    { maxLength: 200, message: '个人简介不能超过200个字符' }
+  ],
   agreement: [
     {
       validator: (value: any, callback: any) => {
@@ -252,6 +373,50 @@ const rules = {
   ]
 }
 
+// 头像上传
+const avatarUpload = ref()
+const handleAvatarUpload = (file: File) => {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    form.avatar = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
+  return false // 阻止默认上传行为
+}
+
+// 兴趣标签切换
+const toggleInterest = (interest: string, checked: boolean) => {
+  if (checked) {
+    if (!form.interests.includes(interest)) {
+      form.interests.push(interest)
+    }
+  } else {
+    const index = form.interests.indexOf(interest)
+    if (index > -1) {
+      form.interests.splice(index, 1)
+    }
+  }
+}
+
+// 步骤切换
+const nextStep = async () => {
+  if (currentStep.value === 1) {
+    // 第一步验证必填字段
+    const valid = await formRef.value?.validateField(['studentId', 'username', 'email', 'password', 'confirmPassword'])
+    if (valid) return
+  }
+  
+  if (currentStep.value < totalSteps) {
+    currentStep.value++
+  }
+}
+
+const prevStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
+}
+
 // 提交注册
 const handleSubmit = async () => {
   const valid = await formRef.value?.validate()
@@ -262,8 +427,12 @@ const handleSubmit = async () => {
     await register({
       studentId: form.studentId,
       username: form.username,
+      nickname: form.nickname,
       email: form.email,
-      password: form.password
+      password: form.password,
+      avatar: form.avatar,
+      bio: form.bio,
+      interests: form.interests
     })
     Message.success('注册成功，请登录')
     router.push('/login')
@@ -364,8 +533,11 @@ if (localStorage.getItem('theme') === 'dark') {
 
 .form-wrapper {
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .form-header {
@@ -378,9 +550,38 @@ if (localStorage.getItem('theme') === 'dark') {
   animation-duration: 0.5s;
 }
 
+.steps-container {
+  margin-bottom: 2rem;
+}
+
 .register-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  
   :deep(.arco-form-item) {
     margin-bottom: 20px;
+  }
+}
+
+.step-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.step-actions {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border-2);
+  
+  :deep(.arco-space) {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  :deep(.arco-btn) {
+    flex: 1;
+    max-width: 140px;
   }
 }
 
@@ -391,14 +592,106 @@ if (localStorage.getItem('theme') === 'dark') {
   z-index: 100;
 }
 
+// 新增样式
+.avatar-upload-container {
+  text-align: center;
+}
+
+.avatar-upload {
+  width: 100px;
+  height: 100px;
+  border: 2px dashed var(--color-border-2);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+
+  &:hover {
+    border-color: var(--color-primary-6);
+    background-color: var(--color-primary-1);
+  }
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.upload-text {
+  font-size: 12px;
+  color: var(--color-text-3);
+  margin-top: 4px;
+}
+
+.upload-tip {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.interests-container {
+  .interests-tip {
+    display: block;
+    margin-bottom: 12px;
+  }
+}
+
+.interests-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.interest-tag {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
 // 响应式
 @media (max-width: 768px) {
   .form-wrapper {
     padding: 1.5rem;
+    max-width: 100%;
   }
 
   .banner-section {
     display: none;
+  }
+
+  .steps-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .interests-grid {
+    gap: 6px;
+  }
+
+  .interest-tag {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .step-actions {
+    padding-top: 1rem;
+    
+    :deep(.arco-btn) {
+      max-width: none;
+    }
   }
 }
 </style>

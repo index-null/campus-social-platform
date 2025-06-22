@@ -19,7 +19,7 @@ export const register = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { studentId, username, email, password } = req.body;
+    const { studentId, username, nickname, email, password, avatar, bio, interests } = req.body;
 
     // 检查用户是否已存在
     const existingUser = await User.findOne({
@@ -31,12 +31,20 @@ export const register = async (
     }
 
     // 创建新用户
-    const user = await User.create({
+    const userData: any = {
       studentId,
       username,
       email,
       password
-    });
+    };
+
+    // 添加可选字段
+    if (nickname) userData.nickname = nickname;
+    if (avatar) userData.avatar = avatar;
+    if (bio) userData.bio = bio;
+    if (interests && Array.isArray(interests)) userData.interests = interests;
+
+    const user = await User.create(userData);
 
     const token = generateToken(user.id);
 
@@ -47,7 +55,11 @@ export const register = async (
         id: user.id,
         studentId: user.studentId,
         username: user.username,
+        nickname: user.nickname,
         email: user.email,
+        avatar: user.avatar,
+        bio: user.bio,
+        interests: user.interests,
         role: user.role
       }
     });
@@ -94,6 +106,7 @@ export const login = async (
         id: user.id,
         studentId: user.studentId,
         username: user.username,
+        nickname: user.nickname,
         email: user.email,
         role: user.role,
         avatar: user.avatar,
@@ -127,7 +140,7 @@ export const updateProfile = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const updates = ['username', 'bio', 'interests', 'avatar'];
+    const updates = ['username', 'nickname', 'bio', 'interests', 'avatar'];
     const updateData: Record<string, unknown> = {};
 
     updates.forEach(field => {
