@@ -11,8 +11,9 @@ dotenv.config();
 
 import connectDB from './config/database';
 import authRoutes from './routes/auth';
-import { errorHandler } from './middleware/errorHandler';
 import postRoutes from './routes/postRoutes';
+import adminRoutes from './routes/admin';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -46,6 +47,7 @@ app.use('/uploads', express.static('uploads'));
 // API路由
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 健康检查
 app.get('/api/health', (req, res) => {

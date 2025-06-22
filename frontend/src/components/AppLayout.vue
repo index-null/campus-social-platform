@@ -46,6 +46,10 @@
                     <template #icon><icon-user /></template>
                     个人主页
                   </a-doption>
+                  <a-doption v-if="user?.role === 'admin'" @click="router.push('/admin')">
+                    <template #icon><icon-settings /></template>
+                    管理后台
+                  </a-doption>
                   <a-doption @click="router.push('/settings')">
                     <template #icon><icon-settings /></template>
                     设置

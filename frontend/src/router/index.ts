@@ -25,6 +25,12 @@ const routes: RouteRecordRaw[] = [
     name: 'Profile',
     component: () => import('../views/Profile.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('../views/Admin.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 
@@ -39,6 +45,9 @@ router.beforeEach((to, _from, next) => {
   
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
+  } else if (to.meta.requiresAdmin && userStore.user?.role !== 'admin') {
+    // 非管理员访问管理页面，重定向到首页
+    next({ name: 'Home' })
   } else if (to.meta.guest && userStore.isLoggedIn) {
     next({ name: 'Home' })
   } else {

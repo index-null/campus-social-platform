@@ -79,7 +79,7 @@
           >
             <div class="publish-input" @click="showPostModal = true">
               <a-avatar
-                :src="user?.avatar || `https://ui-avatars.com/api/?name=${user?.username}`"
+                :src="getAvatarUrl(user)"
                 :size="40"
               />
               <a-typography-text class="input-placeholder" type="secondary">
@@ -321,10 +321,10 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { Message } from '@arco-design/web-vue'
 import { getRandomImage, getImageByScene } from '@/config/images'
+import { getAvatarUrl } from '@/utils/avatar'
 import AppLayout from '@/components/AppLayout.vue'
 import PostCard from '@/components/PostCard.vue'
-import { getPublicPosts, getFeed } from '@/api/auth'; // 从您的 api 文件导入
-import type { IPost } from '@/types'; // 强烈建议为 Post 创建类型定义，如果已有请忽略
+import { getPublicPosts } from '@/api/auth'
 
 const router = useRouter()
 const userStore = useUserStore()
