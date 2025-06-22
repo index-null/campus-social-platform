@@ -13,11 +13,22 @@ const AVATAR_PREFIX = 'avatar_'
 export function saveUserAvatar(userId: string, avatarData: string): void {
   try {
     if (avatarData && avatarData.startsWith('data:image/')) {
-      localStorage.setItem(AVATAR_PREFIX + userId, avatarData)
-      console.log('头像已保存到localStorage:', userId)
+      const key = AVATAR_PREFIX + userId
+      localStorage.setItem(key, avatarData)
+      console.log('saveUserAvatar: 头像已保存到localStorage', {
+        key,
+        userId,
+        dataLength: avatarData.length
+      })
+    } else {
+      console.error('saveUserAvatar: 无效的头像数据', {
+        userId,
+        hasData: !!avatarData,
+        isValidFormat: avatarData ? avatarData.startsWith('data:image/') : false
+      })
     }
   } catch (error) {
-    console.error('保存头像失败:', error)
+    console.error('saveUserAvatar: 保存头像失败', { userId, error })
   }
 }
 
@@ -28,9 +39,17 @@ export function saveUserAvatar(userId: string, avatarData: string): void {
  */
 export function getUserAvatar(userId: string): string | null {
   try {
-    return localStorage.getItem(AVATAR_PREFIX + userId)
+    const key = AVATAR_PREFIX + userId
+    const avatar = localStorage.getItem(key)
+    console.log('getUserAvatar: 查询头像', {
+      key,
+      userId,
+      found: !!avatar,
+      dataLength: avatar?.length || 0
+    })
+    return avatar
   } catch (error) {
-    console.error('获取头像失败:', error)
+    console.error('getUserAvatar: 获取头像失败', { userId, error })
     return null
   }
 }
@@ -41,10 +60,11 @@ export function getUserAvatar(userId: string): string | null {
  */
 export function removeUserAvatar(userId: string): void {
   try {
-    localStorage.removeItem(AVATAR_PREFIX + userId)
-    console.log('头像已删除:', userId)
+    const key = AVATAR_PREFIX + userId
+    localStorage.removeItem(key)
+    console.log('removeUserAvatar: 头像已删除', { key, userId })
   } catch (error) {
-    console.error('删除头像失败:', error)
+    console.error('removeUserAvatar: 删除头像失败', { userId, error })
   }
 }
 
@@ -55,15 +75,30 @@ export function removeUserAvatar(userId: string): void {
  */
 export function getAvatarUrl(user: any): string {
   if (!user) {
+    console.log('getAvatarUrl: 用户对象为空，返回默认头像')
     return 'https://ui-avatars.com/api/?name=User&background=random'
   }
 
+  // 尝试多种方式获取用户ID
+  const userId = user.id || user.studentId || user._id
+  if (!userId) {
+    console.log('getAvatarUrl: 用户ID不存在，返回默认头像')
+    const name = user.nickname || user.username || 'User'
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
+  }
+
+  // 确保用户ID是字符串格式
+  const userIdStr = String(userId)
+  console.log('getAvatarUrl: 查找头像，用户ID:', userIdStr)
+
   // 优先从localStorage获取
-  const storedAvatar = getUserAvatar(user.id || user.studentId)
+  const storedAvatar = getUserAvatar(userIdStr)
   if (storedAvatar) {
+    console.log('getAvatarUrl: 从localStorage获取到头像')
     return storedAvatar
   }
 
+  console.log('getAvatarUrl: localStorage中无头像，返回默认头像')
   // 默认头像
   const name = user.nickname || user.username || 'User'
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`

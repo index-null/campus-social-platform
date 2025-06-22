@@ -19,11 +19,22 @@
           
           <div class="profile-info">
             <div class="info-left">
-              <a-avatar
-                :size="120"
-                :src="getAvatarUrl(profileUser)"
-                class="profile-avatar"
-              />
+              <div class="avatar-container">
+                <img 
+                  v-if="profileAvatarUrl && profileAvatarUrl.startsWith('data:image/')"
+                  :src="profileAvatarUrl"
+                  :key="`img-${profileAvatarUrl}`"
+                  class="profile-avatar custom-avatar"
+                  alt="头像"
+                />
+                <a-avatar
+                  v-else
+                  :size="120"
+                  :src="profileAvatarUrl"
+                  class="profile-avatar"
+                  :key="`avatar-${profileAvatarUrl}`"
+                />
+              </div>
               <div class="profile-details">
                 <a-typography-title :heading="3" style="margin: 0">
                   {{ profileUser?.username || '加载中...' }}
@@ -52,10 +63,17 @@
                 </a-button>
                 <a-button>发消息</a-button>
               </a-space>
-              <a-button v-else @click="showEditModal = true">
-                <template #icon><icon-edit /></template>
-                编辑资料
-              </a-button>
+              <a-space v-else direction="vertical">
+                <a-button @click="showEditModal = true">
+                  <template #icon><icon-edit /></template>
+                  编辑资料
+                </a-button>
+                <!-- 调试信息按钮 -->
+                <a-button size="small" type="text" @click="debugAvatars">
+                  <template #icon><icon-bug /></template>
+                  调试头像
+                </a-button>
+              </a-space>
             </div>
           </div>
           
@@ -195,11 +213,22 @@
           <div class="avatar-upload-section">
             <div class="avatar-preview-container">
               <a-spin :loading="avatarUploading">
-                <a-avatar
-                  :size="80"
-                  :src="editForm.avatar || getAvatarUrl(currentUser)"
-                  class="profile-avatar-preview"
-                />
+                <div class="avatar-preview-wrapper">
+                  <img 
+                    v-if="editFormAvatarUrl && editFormAvatarUrl.startsWith('data:image/')"
+                    :src="editFormAvatarUrl"
+                    :key="`edit-img-${editFormAvatarUrl}`"
+                    class="profile-avatar-preview custom-avatar-preview"
+                    alt="头像预览"
+                  />
+                  <a-avatar
+                    v-else
+                    :size="80"
+                    :src="editFormAvatarUrl"
+                    class="profile-avatar-preview"
+                    :key="`edit-avatar-${editFormAvatarUrl}`"
+                  />
+                </div>
               </a-spin>
             </div>
             <div class="avatar-actions">
@@ -273,7 +302,7 @@ import { useUserStore } from '@/stores/user'
 import { Message } from '@arco-design/web-vue'
 import { getImageByScene } from '@/config/images'
 import { updateProfile } from '@/api/auth'
-import { getAvatarUrl, validateAvatarFile, fileToBase64, saveUserAvatar, removeUserAvatar } from '@/utils/avatar'
+import { getAvatarUrl, validateAvatarFile, fileToBase64, saveUserAvatar, removeUserAvatar, getUserAvatar } from '@/utils/avatar'
 import AppLayout from '@/components/AppLayout.vue'
 import PostCard from '@/components/PostCard.vue'
 
@@ -289,6 +318,26 @@ const profileUser = ref<any>(null)
 const profileId = computed(() => route.params.id || currentUser.value?.id)
 const isOwnProfile = computed(() => !route.params.id || route.params.id === currentUser.value?.id)
 const isFollowing = ref(false)
+
+// 头像URL响应式计算属性，用于强制刷新
+const profileAvatarUrl = ref('')
+const editFormAvatarUrl = ref('')
+
+// 更新头像URL的函数
+const updateAvatarUrls = () => {
+  if (profileUser.value) {
+    const newUrl = getAvatarUrl(profileUser.value)
+    console.log('更新profileAvatarUrl:', newUrl.substring(0, 50) + '...')
+    profileAvatarUrl.value = newUrl
+  }
+  
+  if (currentUser.value) {
+    const userId = String(currentUser.value.id)
+    const storedAvatar = getUserAvatar(userId)
+    editFormAvatarUrl.value = storedAvatar || getAvatarUrl(currentUser.value)
+    console.log('更新editFormAvatarUrl:', editFormAvatarUrl.value ? '存在' : '不存在')
+  }
+}
 
 // 状态管理
 const loading = ref(false)
@@ -350,6 +399,7 @@ watch(() => route.params.id, () => {
 // 初始化
 onMounted(() => {
   loadUserProfile()
+  updateAvatarUrls()
 })
 
 // 加载用户资料
@@ -385,6 +435,9 @@ const loadUserProfile = async () => {
     
     // 加载动态
     loadPosts()
+    
+    // 更新头像URL
+    updateAvatarUrls()
   } finally {
     loading.value = false
   }
@@ -470,13 +523,22 @@ const avatarUploading = ref(false)
 
 // 头像上传
 const handleAvatarChange = async (_fileList: any[], file: any) => {
-  if (!file || !file.file) return
+  if (!file || !file.file) {
+    console.warn('头像上传：没有接收到文件')
+    return
+  }
   
   const currentFile = file.file
+  console.log('头像上传开始：', {
+    fileName: currentFile.name,
+    fileSize: currentFile.size,
+    fileType: currentFile.type
+  })
   
   // 使用工具函数验证文件
   const validation = validateAvatarFile(currentFile)
   if (!validation.valid) {
+    console.error('头像验证失败：', validation.message)
     Message.error(validation.message)
     return
   }
@@ -486,11 +548,35 @@ const handleAvatarChange = async (_fileList: any[], file: any) => {
   try {
     // 使用工具函数转换为base64
     const result = await fileToBase64(currentFile)
+    console.log('头像转换成功，数据长度:', result.length)
+    
     editForm.avatar = result
     
     // 立即保存到localStorage
     if (currentUser.value?.id) {
-      saveUserAvatar(currentUser.value.id, result)
+      const userId = String(currentUser.value.id)
+      console.log('保存头像到localStorage，用户ID:', userId)
+      
+      saveUserAvatar(userId, result)
+      
+      // 验证保存是否成功
+      const savedAvatar = getUserAvatar(userId)
+      if (savedAvatar) {
+        console.log('头像保存验证成功')
+        
+        // 立即更新头像URL显示
+        updateAvatarUrls()
+        
+        // 立即更新profileUser的显示
+        if (isOwnProfile.value && profileUser.value) {
+          // 触发reactivity更新，让头像立即显示
+          profileUser.value = { ...profileUser.value }
+        }
+      } else {
+        console.error('头像保存验证失败')
+      }
+    } else {
+      console.error('当前用户ID不存在，无法保存头像')
     }
     
     Message.success('头像上传成功')
@@ -504,11 +590,34 @@ const handleAvatarChange = async (_fileList: any[], file: any) => {
 
 // 删除头像
 const removeAvatar = () => {
+  console.log('删除头像开始')
   editForm.avatar = ''
   
   // 从localStorage删除
   if (currentUser.value?.id) {
-    removeUserAvatar(currentUser.value.id)
+    const userId = String(currentUser.value.id)
+    console.log('从localStorage删除头像，用户ID:', userId)
+    
+    removeUserAvatar(userId)
+    
+    // 验证删除是否成功
+    const remainingAvatar = getUserAvatar(userId)
+    if (!remainingAvatar) {
+      console.log('头像删除验证成功')
+      
+      // 立即更新头像URL显示
+      updateAvatarUrls()
+      
+      // 立即更新profileUser的显示
+      if (isOwnProfile.value && profileUser.value) {
+        // 触发reactivity更新，让头像立即更新
+        profileUser.value = { ...profileUser.value }
+      }
+    } else {
+      console.error('头像删除验证失败')
+    }
+  } else {
+    console.error('当前用户ID不存在，无法删除头像')
   }
   
   Message.success('头像已删除')
@@ -561,12 +670,25 @@ const resetEditForm = () => {
     editForm.interests = currentUser.value.interests || []
     editForm.email = currentUser.value.email
     
-    // 从localStorage获取头像
-    editForm.avatar = getAvatarUrl(currentUser.value)
+    // 直接从localStorage获取头像数据
+    const userId = String(currentUser.value.id)
+    const storedAvatar = getUserAvatar(userId)
+    
+    console.log('重置编辑表单 - 用户ID:', userId)
+    console.log('从localStorage获取的头像:', storedAvatar ? '存在' : '不存在')
+    
+    if (storedAvatar) {
+      editForm.avatar = storedAvatar
+      console.log('编辑表单头像已设置为localStorage中的数据')
+    } else {
+      editForm.avatar = ''
+      console.log('localStorage中无头像数据，重置为空')
+    }
+    
+    // 更新头像URL显示
+    updateAvatarUrls()
   }
 }
-
-
 
 // 打开编辑弹窗时初始化表单
 watch(showEditModal, (val) => {
@@ -574,6 +696,36 @@ watch(showEditModal, (val) => {
     resetEditForm()
   }
 })
+
+// 调试头像
+const debugAvatars = () => {
+  console.log('🔍 调试头像信息:')
+  console.log('- profileAvatarUrl:', profileAvatarUrl.value)
+  console.log('- editFormAvatarUrl:', editFormAvatarUrl.value)
+  console.log('- currentUser:', currentUser.value)
+  console.log('- profileUser:', profileUser.value)
+  console.log('- editForm.avatar:', editForm.avatar)
+  console.log('- isOwnProfile:', isOwnProfile.value)
+  
+  if (currentUser.value?.id) {
+    const userId = String(currentUser.value.id)
+    const storedAvatar = getUserAvatar(userId)
+    console.log('- localStorage中的头像 (userId:', userId, '):', storedAvatar ? '存在' : '不存在')
+    
+    if (storedAvatar) {
+      console.log('- 头像数据长度:', storedAvatar.length)
+      console.log('- 头像格式:', storedAvatar.substring(0, 30) + '...')
+    }
+  }
+  
+  // 检查所有localStorage中的avatar数据
+  const allKeys = Object.keys(localStorage)
+  const avatarKeys = allKeys.filter(key => key.startsWith('avatar_'))
+  console.log('- localStorage中所有头像key:', avatarKeys)
+  
+  updateAvatarUrls()
+  Message.info('调试信息已打印到控制台')
+}
 </script>
 
 <style scoped lang="less">
@@ -622,6 +774,10 @@ watch(showEditModal, (val) => {
     .info-left {
       display: flex;
       gap: 24px;
+      
+      .avatar-container {
+        position: relative;
+      }
       
       .profile-avatar {
         border: 4px solid var(--color-bg-2);
@@ -694,6 +850,32 @@ watch(showEditModal, (val) => {
   line-height: 1.4;
 }
 
+.custom-avatar {
+  width: 120px !important;
+  height: 120px !important;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--color-bg-2);
+  background: var(--color-bg-2);
+}
+
+.custom-avatar-preview {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border-2);
+  cursor: pointer;
+  
+  &:hover {
+    border-color: var(--color-primary-6);
+  }
+}
+
+.avatar-preview-wrapper {
+  display: inline-block;
+}
+
 // 响应式处理
 @media (max-width: 768px) {
   .profile-header {
@@ -709,7 +891,7 @@ watch(showEditModal, (val) => {
         flex-direction: column;
         text-align: center;
         
-        .profile-avatar {
+        .avatar-container {
           margin: 0 auto;
         }
         

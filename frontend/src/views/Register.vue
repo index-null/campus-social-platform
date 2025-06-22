@@ -506,8 +506,24 @@ const handleSubmit = async () => {
     
     // 注册成功后，如果有头像则保存到localStorage
     if (form.avatar && response.user?.id) {
-      saveUserAvatar(response.user.id, form.avatar)
-      console.log('头像已保存到localStorage，用户ID:', response.user.id)
+      console.log('准备保存头像，用户ID:', response.user.id)
+      console.log('头像数据长度:', form.avatar.length)
+      
+      // 确保使用字符串形式的用户ID
+      const userId = String(response.user.id)
+      saveUserAvatar(userId, form.avatar)
+      
+      console.log('头像已保存到localStorage，用户ID:', userId)
+      
+      // 验证保存是否成功
+      const savedAvatar = localStorage.getItem(`avatar_${userId}`)
+      if (savedAvatar) {
+        console.log('头像保存验证成功')
+      } else {
+        console.error('头像保存验证失败')
+      }
+    } else {
+      console.log('无头像数据或用户ID，跳过头像保存')
     }
     
     // 清理临时头像数据
