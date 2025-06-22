@@ -1,10 +1,9 @@
 <template>
   <a-layout class="app-layout">
-    <!-- 顶部导航 -->
     <a-layout-header class="app-header">
       <div class="header-content">
         <div class="header-left">
-          <icon-apps-add :size="32" />
+          <img :src="logoUrl" alt="Logo" class="logo-image" @click="router.push('/')" />
           <a-typography-title 
             :heading="5" 
             style="margin: 0; cursor: pointer;" 
@@ -13,26 +12,22 @@
             校园社交平台
           </a-typography-title>
         </div>
-
         <div class="header-center">
           <slot name="header-center">
             <a-input-search
               v-if="showSearch"
               placeholder="搜索用户、动态..."
               style="width: 300px"
-            />
+            ></a-input-search>
           </slot>
         </div>
-
         <div class="header-right">
           <a-space :size="16">
-            <!-- 主题切换 -->
             <a-button shape="circle" @click="toggleTheme">
               <icon-moon v-if="!isDark" />
               <icon-sun v-else />
             </a-button>
 
-            <!-- 已登录状态 -->
             <template v-if="isLoggedIn">
               <a-badge :count="3" dot>
                 <a-button shape="circle">
@@ -45,7 +40,7 @@
                   :size="36"
                   :src="user?.avatar || `https://ui-avatars.com/api/?name=${user?.username}`"
                   style="cursor: pointer"
-                />
+                ></a-avatar>
                 <template #content>
                   <a-doption @click="router.push(`/profile/${user?.id}`)">
                     <template #icon><icon-user /></template>
@@ -64,7 +59,6 @@
               </a-dropdown>
             </template>
 
-            <!-- 未登录状态 -->
             <template v-else>
               <a-button type="primary" @click="router.push('/login')">
                 登录
@@ -78,12 +72,10 @@
       </div>
     </a-layout-header>
 
-    <!-- 主体内容 -->
     <a-layout-content class="app-content">
       <slot />
     </a-layout-content>
 
-    <!-- 底部（可选） -->
     <a-layout-footer v-if="showFooter" class="app-footer">
       <slot name="footer">
         <a-typography-text type="secondary">
@@ -98,6 +90,9 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+// ADDED START: 导入您的 logo 图片
+import logoUrl from '@/assets/logo.png'; // <-- 确保路径和文件名正确
+// ADDED END
 
 interface Props {
   showSearch?: boolean
@@ -218,4 +213,10 @@ if (localStorage.getItem('theme') === 'dark') {
     }
   }
 }
-</style> 
+
+// ADDED START: 添加 logo 图片的样式
+.logo-image {
+  height: 32px;
+}
+// ADDED END
+</style>

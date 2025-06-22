@@ -59,4 +59,20 @@ export const updateProfile = (data: any) => {
   return api.put('/auth/profile', data)
 }
 
+export const getPublicPosts = () => {
+  // 这个请求会调用 GET /api/posts/public
+  // 注意：这个请求虽然也会被拦截器加上Token（如果存在），但这没关系，
+  // 因为我们的后端公开接口不校验Token，所以不影响结果。
+  return api.get('/posts/public');
+}
+
+/**
+ * 获取需要登录才能看到的动态列表（例如你的主页Feed流）
+ */
+export const getFeed = () => {
+  // 这个请求会通过请求拦截器自动带上认证的 Token
+  // 它会请求 GET /api/posts (假设这是您为登录用户设计的路由)
+  return api.get('/posts');
+}
+
 export default api 
