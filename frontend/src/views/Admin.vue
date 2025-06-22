@@ -47,8 +47,8 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="今日动态"
-              :value="stats.todayPosts"
+              title="今日新用户"
+              :value="stats.todayNewUsers"
               :value-style="{ color: '#fa541c' }"
             >
               <template #prefix>
@@ -85,9 +85,17 @@
 
         <a-table
           :columns="columns"
-          :data="filteredUsers"
+          :data="users"
           :loading="loading"
-          :pagination="pagination"
+          :pagination="{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showTotal: true,
+            showPageSize: true,
+            pageSizeOptions: ['10', '20', '50'],
+            showJumper: true
+          }"
           @page-change="handlePageChange"
           @page-size-change="handlePageSizeChange"
         >
@@ -201,9 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { ref, onMounted, reactive, watch } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { getAvatarUrl } from '@/utils/avatar'
 import { 
@@ -215,18 +221,6 @@ import {
   toggleUserStatus as toggleUserStatusAPI 
 } from '@/api/admin'
 import AppLayout from '@/components/AppLayout.vue'
-
-const router = useRouter()
-const userStore = useUserStore()
-
-// 权限检查
-const currentUser = computed(() => userStore.user)
-const isAdmin = computed(() => currentUser.value?.role === 'admin')
-
-// 如果不是管理员，重定向到首页
-if (!isAdmin.value) {
-  router.push('/')
-}
 
 // 状态管理
 const loading = ref(false)
@@ -241,23 +235,12 @@ const formRef = ref()
 const stats = reactive({
   totalUsers: 0,
   activeUsers: 0,
-  todayPosts: 0,
+  todayNewUsers: 0,
   adminUsers: 0
 })
 
 // 用户列表
 const users = ref<any[]>([])
-const filteredUsers = computed(() => {
-  if (!searchKeyword.value) return users.value
-  
-  const keyword = searchKeyword.value.toLowerCase()
-  return users.value.filter(user => 
-    user.username.toLowerCase().includes(keyword) ||
-    user.studentId.includes(keyword) ||
-    user.email.toLowerCase().includes(keyword) ||
-    (user.nickname && user.nickname.toLowerCase().includes(keyword))
-  )
-})
 
 // 分页
 const pagination = reactive({
@@ -364,9 +347,23 @@ const loadUsers = async () => {
       search: searchKeyword.value
     })
     
-    if (response.data && response.data.data) {
-      users.value = response.data.data
-      pagination.total = response.data.pagination.total
+    console.log('用户列表响应:', response)
+    
+    const data = response as any
+    if (data && data.success) {
+      // 处理MongoDB的_id字段，转换为id
+      const userData = data.data?.map((user: any) => ({
+        ...user,
+        id: user._id || user.id  // 确保有id字段
+      })) || []
+      
+      users.value = userData
+      console.log('处理后的用户数据:', userData)
+      
+      if (data.pagination) {
+        pagination.total = data.pagination.total
+        console.log('分页信息:', data.pagination)
+      }
     } else {
       users.value = []
       pagination.total = 0
@@ -385,8 +382,20 @@ const loadUsers = async () => {
 const loadStats = async () => {
   try {
     const response = await fetchAdminStats()
-    if (response.data && response.data.stats) {
-      Object.assign(stats, response.data.stats)
+    console.log('完整响应:', response)
+    
+    const data = response as any
+    if (data && data.success && data.stats) {
+      console.log('更新统计数据:', data.stats)
+      // 直接赋值确保响应式更新
+      const statsData = data.stats
+      stats.totalUsers = statsData.totalUsers || 0
+      stats.activeUsers = statsData.activeUsers || 0
+      stats.todayNewUsers = statsData.todayNewUsers || 0
+      stats.adminUsers = statsData.adminUsers || 0
+      console.log('更新后的stats:', stats)
+    } else {
+      console.error('统计数据格式错误:', data)
     }
   } catch (error) {
     console.error('加载统计数据失败:', error)
@@ -403,16 +412,19 @@ const refreshData = () => {
 // 搜索处理
 const handleSearch = () => {
   pagination.current = 1
+  loadUsers()
 }
 
 // 分页处理
 const handlePageChange = (page: number) => {
   pagination.current = page
+  loadUsers()
 }
 
 const handlePageSizeChange = (pageSize: number) => {
   pagination.pageSize = pageSize
   pagination.current = 1
+  loadUsers()
 }
 
 // 编辑用户
@@ -464,11 +476,12 @@ const handleSaveUser = async () => {
         isActive: editForm.isActive
       })
       
-      if (response.data && response.data.user) {
+      const data = response as any
+      if (data && data.user) {
         // 更新本地数据
         const index = users.value.findIndex(u => u.id === editingUser.value.id)
         if (index !== -1) {
-          users.value[index] = response.data.user
+          users.value[index] = data.user
         }
       }
       Message.success('用户更新成功')
@@ -486,8 +499,9 @@ const handleSaveUser = async () => {
         isActive: editForm.isActive
       })
       
-      if (response.data && response.data.user) {
-        users.value.unshift(response.data.user)
+      const data = response as any
+      if (data && data.user) {
+        users.value.unshift(data.user)
         pagination.total++
       }
       Message.success('用户创建成功')
@@ -497,7 +511,7 @@ const handleSaveUser = async () => {
     loadStats()
   } catch (error: any) {
     console.error('保存用户失败:', error)
-    Message.error(error.response?.data?.message || '操作失败')
+    Message.error(error.message || '操作失败')
   } finally {
     saving.value = false
   }
@@ -521,14 +535,15 @@ const toggleUserStatus = async (user: any) => {
   try {
     const response = await toggleUserStatusAPI(user.id)
     
-    if (response.data && response.data.user) {
-      user.isActive = response.data.user.isActive
+    const data = response as any
+    if (data && data.user) {
+      user.isActive = data.user.isActive
       Message.success(`用户已${user.isActive ? '启用' : '禁用'}`)
       loadStats()
     }
   } catch (error: any) {
     console.error('切换用户状态失败:', error)
-    Message.error(error.response?.data?.message || '操作失败')
+    Message.error(error.message || '操作失败')
   }
 }
 
