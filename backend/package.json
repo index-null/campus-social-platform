@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
-    "seed": "ts-node src/scripts/seed.ts"
+    "seed": "ts-node src/scripts/seed.ts",
+    "seed:demo": "ts-node src/scripts/seedDemoUsers.ts"
   },
   "keywords": [
     "campus",
