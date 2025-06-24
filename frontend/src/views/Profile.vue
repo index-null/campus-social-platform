@@ -27,13 +27,13 @@
                   class="profile-avatar custom-avatar"
                   alt="头像"
                 />
-                <a-avatar
+              <a-avatar
                   v-else
-                  :size="120"
+                :size="120"
                   :src="profileAvatarUrl"
-                  class="profile-avatar"
+                class="profile-avatar"
                   :key="`avatar-${profileAvatarUrl}`"
-                />
+              />
               </div>
               <div class="profile-details">
                 <a-typography-title :heading="3" style="margin: 0">
@@ -65,9 +65,9 @@
               </a-space>
               <a-space v-else direction="vertical">
                 <a-button @click="showEditModal = true">
-                  <template #icon><icon-edit /></template>
-                  编辑资料
-                </a-button>
+                <template #icon><icon-edit /></template>
+                编辑资料
+              </a-button>
                 <!-- 调试信息按钮 -->
                 <a-button size="small" type="text" @click="debugAvatars">
                   <template #icon><icon-bug /></template>
@@ -221,13 +221,13 @@
                     class="profile-avatar-preview custom-avatar-preview"
                     alt="头像预览"
                   />
-                  <a-avatar
+                <a-avatar
                     v-else
-                    :size="80"
+                  :size="80"
                     :src="editFormAvatarUrl"
-                    class="profile-avatar-preview"
+                  class="profile-avatar-preview"
                     :key="`edit-avatar-${editFormAvatarUrl}`"
-                  />
+                />
                 </div>
               </a-spin>
             </div>

@@ -351,7 +351,7 @@ const loadUsers = async () => {
     
     const data = response as any
     if (data && data.success) {
-      // 处理MongoDB的_id字段，转换为id
+      // 处理MongoDB的_id字段，转换为id，并确保数据结构正确
       const userData = data.data?.map((user: any) => ({
         ...user,
         id: user._id || user.id  // 确保有id字段
@@ -466,7 +466,13 @@ const handleSaveUser = async () => {
   try {
     if (editingUser.value) {
       // 更新用户
-      const response = await updateUserAPI(editingUser.value.id, {
+      console.log('更新用户 - 用户ID:', editingUser.value.id || editingUser.value._id)
+      const userId = editingUser.value.id || editingUser.value._id
+      if (!userId) {
+        throw new Error('用户ID不存在')
+      }
+      
+      const response = await updateUserAPI(userId, {
         username: editForm.username,
         nickname: editForm.nickname,
         email: editForm.email,
@@ -477,14 +483,20 @@ const handleSaveUser = async () => {
       })
       
       const data = response as any
-      if (data && data.user) {
-        // 更新本地数据
-        const index = users.value.findIndex(u => u.id === editingUser.value.id)
-        if (index !== -1) {
-          users.value[index] = data.user
+      if (data && data.success && data.user) {
+        // 更新本地数据，确保ID一致性
+        const updatedUser = {
+          ...data.user,
+          id: data.user._id || data.user.id
         }
+        const index = users.value.findIndex(u => (u.id || u._id) === userId)
+        if (index !== -1) {
+          users.value[index] = updatedUser
+        }
+        Message.success(data.message || '用户更新成功')
+      } else {
+        throw new Error(data.message || '更新失败')
       }
-      Message.success('用户更新成功')
     } else {
       // 创建用户
       const response = await createUserAPI({
@@ -500,18 +512,25 @@ const handleSaveUser = async () => {
       })
       
       const data = response as any
-      if (data && data.user) {
-        users.value.unshift(data.user)
+      if (data && data.success && data.user) {
+        // 确保新用户有正确的ID
+        const newUser = {
+          ...data.user,
+          id: data.user._id || data.user.id
+        }
+        users.value.unshift(newUser)
         pagination.total++
+        Message.success(data.message || '用户创建成功')
+      } else {
+        throw new Error(data.message || '创建失败')
       }
-      Message.success('用户创建成功')
     }
     
     showEditModal.value = false
-    loadStats()
+    loadStats() // 重新加载统计数据
   } catch (error: any) {
     console.error('保存用户失败:', error)
-    Message.error(error.message || '操作失败')
+    Message.error(error.message || '网络错误，请稍后重试')
   } finally {
     saving.value = false
   }
@@ -533,36 +552,58 @@ const resetEditForm = () => {
 // 切换用户状态
 const toggleUserStatus = async (user: any) => {
   try {
-    const response = await toggleUserStatusAPI(user.id)
+    console.log('切换用户状态 - 用户ID:', user.id || user._id)
+    const userId = user.id || user._id
+    if (!userId) {
+      throw new Error('用户ID不存在')
+    }
+    
+    const response = await toggleUserStatusAPI(userId)
+    console.log('切换状态响应:', response)
     
     const data = response as any
-    if (data && data.user) {
+    if (data && data.success) {
+      // 更新本地用户状态
       user.isActive = data.user.isActive
-      Message.success(`用户已${user.isActive ? '启用' : '禁用'}`)
-      loadStats()
+      Message.success(data.message || `用户已${user.isActive ? '启用' : '禁用'}`)
+      loadStats() // 重新加载统计数据
+    } else {
+      throw new Error(data.message || '操作失败')
     }
   } catch (error: any) {
     console.error('切换用户状态失败:', error)
-    Message.error(error.message || '操作失败')
+    Message.error(error.message || '网络错误，请稍后重试')
   }
 }
 
 // 删除用户
 const deleteUser = async (user: any) => {
   try {
-    await deleteUserAPI(user.id)
-    
-    const index = users.value.findIndex(u => u.id === user.id)
-    if (index !== -1) {
-      users.value.splice(index, 1)
-      pagination.total--
+    console.log('删除用户 - 用户ID:', user.id || user._id)
+    const userId = user.id || user._id
+    if (!userId) {
+      throw new Error('用户ID不存在')
     }
     
-    Message.success('用户删除成功')
-    loadStats()
+    const response = await deleteUserAPI(userId)
+    console.log('删除用户响应:', response)
+    
+    const data = response as any
+    if (data && data.success) {
+      const index = users.value.findIndex(u => (u.id || u._id) === userId)
+      if (index !== -1) {
+        users.value.splice(index, 1)
+        pagination.total--
+      }
+      
+      Message.success(data.message || '用户删除成功')
+      loadStats() // 重新加载统计数据
+    } else {
+      throw new Error(data.message || '删除失败')
+    }
   } catch (error: any) {
     console.error('删除用户失败:', error)
-    Message.error(error.response?.data?.message || '删除失败')
+    Message.error(error.message || '网络错误，请稍后重试')
   }
 }
 

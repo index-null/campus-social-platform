@@ -150,6 +150,7 @@ export const createUser = async (
       message: '用户创建成功',
       user: {
         id: user.id,
+        _id: user._id,
         studentId: user.studentId,
         username: user.username,
         nickname: user.nickname,
@@ -158,7 +159,8 @@ export const createUser = async (
         interests: user.interests,
         role: user.role,
         isActive: user.isActive,
-        createdAt: user.createdAt
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
       }
     });
   } catch (error) {
@@ -217,10 +219,27 @@ export const updateUser = async (
       { new: true, runValidators: true }
     ).select('-password');
 
+    if (!updatedUser) {
+      throw new AppError('用户更新失败', 500);
+    }
+
     res.json({
       success: true,
       message: '用户更新成功',
-      user: updatedUser
+      user: {
+        id: updatedUser.id,
+        _id: updatedUser._id,
+        studentId: updatedUser.studentId,
+        username: updatedUser.username,
+        nickname: updatedUser.nickname,
+        email: updatedUser.email,
+        bio: updatedUser.bio,
+        interests: updatedUser.interests,
+        role: updatedUser.role,
+        isActive: updatedUser.isActive,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt
+      }
     });
   } catch (error) {
     next(error);
@@ -294,6 +313,7 @@ export const toggleUserStatus = async (
       message: `用户已${user.isActive ? '启用' : '禁用'}`,
       user: {
         id: user.id,
+        _id: user._id,
         isActive: user.isActive
       }
     });
